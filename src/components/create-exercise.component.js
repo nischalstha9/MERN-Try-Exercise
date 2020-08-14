@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import axios from 'axios';
 
 export default class CreateExercise extends Component {
+    //constructor is form binding props and setting initial state on class Components
     constructor(props){
         super(props);
 
@@ -22,10 +24,16 @@ export default class CreateExercise extends Component {
         };
     }
 
+    //componentDidMount is for updating state for example updating with data from api or filtering existing table
     componentDidMount(){
-        this.setState({
-            users:['Nishal'],
-            username:'Nishal',
+        axios.get('http://localhost:5000/users')
+        .then(response => {
+            if (response.data.length > 0){
+                this.setState({
+                    users: response.data.map(user=> user.username),
+                    username: response.data[0].username
+                })
+            }
         })
     }
 
@@ -60,10 +68,11 @@ export default class CreateExercise extends Component {
           username: this.state.username,
           description: this.state.description,
           duration: this.state.duration,
-          date: this.state.date,
+          date: this.state.date
         };
       
-        console.log(exercise);
+        axios.post('http://localhost:5000/exercises/add', exercise)
+        .then(res => console.log(res.data));
         
         window.location = '/';
       }
